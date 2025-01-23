@@ -18,6 +18,7 @@ export default {
                 "custom-red-bg": "#f03c2f",
                 "custom-red-icon": "#f75d54",
                 "custom-red-button": "#f22519",
+                "custom-red-active-sidebar": "#f65c52",
             },
         },
     },
