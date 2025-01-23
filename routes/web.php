@@ -5,7 +5,7 @@ use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('produk.index');
+    return view('product.index');
 });
 Route::get('/login', function () {
     return view('auth.login');

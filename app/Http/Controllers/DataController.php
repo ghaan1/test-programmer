@@ -13,10 +13,9 @@ class DataController extends Controller
     public function getDataCategory()
     {
         try {
-            $dataCategory = DB::table("product_category")->select("id", "name");
-            $query = $dataCategory->get();
+            $dataCategory = DB::table("product_category")->select("id", "name")->get();
             return ApiResponse::success([
-                'category' => $query
+                'category' => $dataCategory
             ], '');
         } catch (Exception $e) {
             Log::error($e->getMessage());
