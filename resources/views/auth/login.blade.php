@@ -6,10 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - SIMS Web App</title>
     @vite('resources/js/app.js')
+    <style>
+        [x-cloak] {
+            display: none;
+        }
+    </style>
 </head>
 
-<body class="font-sans antialiased">
-    <div class="min-h-screen flex">
+<body class="font-sans antialiased" x-data="setupLogin" x-cloak x-init="init()">
+    <div class="min-h-screen flex" x-show="true">
         <div class="w-full md:w-1/2 bg-white flex flex-col justify-center items-center p-8" x-data="setupLogin">
             <div class="max-w-sm w-full">
                 <div class="flex items-center justify-center space-x-2 mb-5">

@@ -19,6 +19,11 @@ class ProductController extends Controller
         return view('product.index');
     }
 
+    public function create()
+    {
+        return view('product.create');
+    }
+
     public function getData(Request $request)
     {
 
@@ -75,6 +80,52 @@ class ProductController extends Controller
         } catch (Exception $e) {
             Log::error($e->getMessage());
             return ApiResponse::error();
+        }
+    }
+
+    public function store(Request $request)
+    {
+        $response = General::checkJWT();
+        if ($response === false) {
+            return ApiResponse::error("Token invalid", 401);
+        }
+
+        $request->validate([
+            'category' => 'required|exists:product_category,id',
+            'name' => 'required|string|unique:product,name',
+            'buy_price' => 'required|numeric',
+            'sell_price' => 'required|numeric',
+            'stock' => 'required|numeric',
+            'image' => 'required|image|mimes:jpg,jpeg,png|max:100',
+        ]);
+        DB::beginTransaction();
+
+        try {
+            $imagePath = null;
+            $idProduct = "P" . General::generateId();
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $fileName = $idProduct . "-" . General::microseconds() . '.' . $file->getClientOriginalExtension();
+                $imagePath = $file->storeAs('images', $fileName, 'public');
+            }
+
+            DB::table('product')->insert([
+                'fk_product_category' => $request->category,
+                'name' => $request->name,
+                'price' => $request->buy_price,
+                'selling_price' => $request->sell_price,
+                'stock'  => $request->stock,
+                'image' => $imagePath,
+            ]);
+
+            return ApiResponse::success([]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return ApiResponse::error($e->getMessage());
+        } finally {
+            DB::commit();
         }
     }
 }

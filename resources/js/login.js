@@ -14,6 +14,11 @@ export default function setupLogin() {
             email: "",
             password: "",
             showPassword: false,
+            isInitialized: false,
+
+            init() {
+                this.isInitialized = true;
+            },
 
             togglePasswordVisibility() {
                 this.showPassword = !this.showPassword;

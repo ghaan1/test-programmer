@@ -4,21 +4,23 @@ import axios from "axios";
 import setupLogin from "./login";
 import sidebar from "./sidebar";
 import product from "./product";
+import createProduct from "./product";
 
 window.Alpine = Alpine;
 
-if (window.location.pathname !== "/") {
-    const token = localStorage.getItem("token");
+// if (window.location.pathname !== "/") {
+//     const token = localStorage.getItem("token");
 
-    if (token) {
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    } else {
-        window.location.href = "/";
-    }
-}
+//     if (token) {
+//         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+//     } else {
+//         window.location.href = "/";
+//     }
+// }
 
 setupLogin();
 Alpine.data("sidebar", sidebar);
 Alpine.data("product", product);
+Alpine.data("createProduct", createProduct);
 
 Alpine.start();

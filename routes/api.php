@@ -17,5 +17,11 @@ Route::group(
             Route::get('data-product', [ProductController::class, 'getData']);
             Route::get('data-product-category', [DataController::class, 'getDataCategory']);
         });
+
+        Route::prefix('product')->group(function () {
+            Route::post('store', [ProductController::class, 'store']);
+            // Route::post('update', [ProductController::class, 'update']);
+            // Route::post('delete', [ProductController::class, 'delete']);
+        });
     }
 );

@@ -32,7 +32,8 @@
                     </span>
                     Export Excel
                 </button>
-                <button class="bg-custom-red-button text-white px-4 py-2 rounded-md flex items-center">
+                <button class="bg-custom-red-button text-white px-4 py-2 rounded-md flex items-center"
+                    @click="window.location.href = '{{ route('product.create') }}'">
                     <span class="mr-2">
                         <img src="{{ asset('assets/image/PlusCircle.png') }}" alt="Add Icon" class="w-4 h-4">
                     </span>

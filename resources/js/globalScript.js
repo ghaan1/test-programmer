@@ -131,4 +131,17 @@ export class globalScript {
         const dataPromise = promise.then((response) => response);
         return dataPromise;
     }
+
+    saveProduct(data) {
+        const token = localStorage.getItem("token");
+        // Tergantung endpoint
+        const promise = axios.post("/api/product/store", data, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const dataPromise = promise.then((response) => response);
+        return dataPromise;
+    }
 }

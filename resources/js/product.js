@@ -1,7 +1,9 @@
 import { globalScript } from "./globalScript";
+import Swal from "sweetalert2";
 
 export default function product() {
     return {
+        // Daftar produk & pagination
         products: [],
         searchTerm: "",
         selectedCategory: "",
@@ -16,6 +18,16 @@ export default function product() {
             total_data_page: 0,
         },
 
+        // Contoh state form untuk create
+        form: {
+            fk_product_category: "",
+            name: "",
+            price: "",
+            selling_price: "",
+            stock: "",
+        },
+
+        // Ambil list kategori
         async getCategories() {
             const global = new globalScript();
             try {
@@ -28,6 +40,7 @@ export default function product() {
             }
         },
 
+        // Ambil list produk
         async getProducts(page = 1) {
             this.loading = true;
             this.noData = false;
@@ -58,6 +71,61 @@ export default function product() {
             }
         },
 
+        // Buat fungsi create product
+        async createProduct() {
+            // Contoh confirm pakai Swal
+            const confirm = await Swal.fire({
+                title: "Konfirmasi",
+                text: "Yakin menyimpan data produk ini?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "Ya, Simpan",
+                cancelButtonText: "Batal",
+            });
+
+            if (!confirm.isConfirmed) {
+                return; // Batal
+            }
+
+            // Panggil globalScript
+            const global = new globalScript();
+            try {
+                // Contoh panggil method saveProduct (Anda buat sendiri di globalScript)
+                const response = await global.saveProduct(this.form);
+
+                if (response.data.status === "success") {
+                    Swal.fire(
+                        "Berhasil",
+                        "Produk berhasil disimpan",
+                        "success"
+                    );
+                    // Reset form
+                    this.form = {
+                        fk_product_category: "",
+                        name: "",
+                        price: "",
+                        selling_price: "",
+                        stock: "",
+                    };
+                    // Refresh data
+                    this.getProducts();
+                } else {
+                    Swal.fire(
+                        "Gagal",
+                        response.data.message || "Terjadi kesalahan",
+                        "error"
+                    );
+                }
+            } catch (error) {
+                Swal.fire(
+                    "Error",
+                    error.response?.data?.message || error.message,
+                    "error"
+                );
+            }
+        },
+
+        // Fungsi filtering & pagination
         filterProducts() {
             this.getProducts(1);
         },
