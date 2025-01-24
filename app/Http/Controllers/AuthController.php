@@ -30,6 +30,9 @@ class AuthController extends Controller
         try {
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
+                $request->session()->start();
+                $request->session()->put('user_id', $user->id);
+                $request->session()->regenerate();
                 $token = JWTAuth::fromUser($user);
                 return ApiResponse::success(['token' => $token]);
             }
@@ -52,6 +55,12 @@ class AuthController extends Controller
             JWTAuth::authenticate($token);
 
             JWTAuth::invalidate($token);
+
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+
             return ApiResponse::success(null);
         } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
             Log::error('Token error: ' . $e->getMessage());

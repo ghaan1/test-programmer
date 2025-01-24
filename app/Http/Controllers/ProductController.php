@@ -10,12 +10,16 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ProductController extends Controller
 {
     public function index()
     {
+        // check session
+        $user = Auth::user();
+        // dd($user);
         return view('product.index');
     }
 
