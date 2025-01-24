@@ -109,6 +109,15 @@ class ProductSeeder extends Seeder
                 'stock' => 120,
                 'image' => 'images/sepatu-lari.jpg',
             ],
+            [
+                'id' => "P" . General::generateId(),
+                'name' => 'Sepatu Lari',
+                'fk_product_category' => $alatOlahraga->id,
+                'price' => 200000,
+                'selling_price' => 260000,
+                'stock' => 120,
+                'image' => 'images/sepatu-lari.jpg',
+            ],
         ];
 
         foreach ($productCategories as $productCategory) {

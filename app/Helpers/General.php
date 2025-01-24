@@ -2,6 +2,9 @@
 
 namespace App\Helpers;
 
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Log;
+
 
 class General
 {
@@ -19,5 +22,24 @@ class General
     public static function formatedNumberIDR($number)
     {
         return 'Rp ' . number_format($number, 0, ',', '.');
+    }
+
+    public static function checkJWT()
+    {
+        $token = JWTAuth::getToken();
+
+        if (!$token) {
+            Log::error('No token provided');
+            return false;
+        }
+
+        try {
+            JWTAuth::parseToken()->authenticate();
+        } catch (\Exception $e) {
+            Log::error('Token is invalid or expired');
+            return false;
+        }
+
+        return true;
     }
 }

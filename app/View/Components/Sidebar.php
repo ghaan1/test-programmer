@@ -30,10 +30,6 @@ class Sidebar extends Component
                 "title" => "Profile",
                 "assets" => "User.png",
             ],
-            [
-                "title" => "Logout",
-                "assets" => "SignOut.png",
-            ]
         ];
 
         return view('components.sidebar')

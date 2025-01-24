@@ -19,6 +19,8 @@ export default {
                 "custom-red-icon": "#f75d54",
                 "custom-red-button": "#f22519",
                 "custom-red-active-sidebar": "#f65c52",
+                "custom-red-add-button": "#f52619",
+                "custom-greed-excel-button": "#067605",
             },
         },
     },

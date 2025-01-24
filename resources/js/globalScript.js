@@ -52,14 +52,82 @@ export class globalScript {
         });
     }
 
-    getDataCategory() {
-        const promise = axios.get(`/get/data-product-category`);
+    login(email, password) {
+        const promise = axios.post("/api/login", {
+            email,
+            password,
+        });
+
         const dataPromise = promise.then((response) => response);
         return dataPromise;
     }
 
-    getDataProduct() {
-        const promise = axios.get(`/get/data-product`);
+    logout() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            this.SwalError(
+                "Token tidak ditemukan. Anda harus login terlebih dahulu.",
+                "Logout",
+                "melakukan"
+            );
+            return;
+        }
+
+        const promise = axios.post(
+            "/api/logout",
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        const dataPromise = promise.then((response) => response);
+        return dataPromise;
+    }
+
+    getDataCategory() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            this.SwalError(
+                "Token tidak ditemukan. Anda harus login terlebih dahulu.",
+                "Logout",
+                "melakukan"
+            );
+            return;
+        }
+        const promise = axios.get(`api/get/data-product-category`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+        });
+        const dataPromise = promise.then((response) => response);
+        return dataPromise;
+    }
+
+    getDataProduct(page = 1, searchTerm = "", category = "") {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            this.SwalError(
+                "Token tidak ditemukan. Anda harus login terlebih dahulu.",
+                "Logout",
+                "melakukan"
+            );
+            return;
+        }
+        const promise = axios.get(`api/get/data-product`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            params: {
+                page: page,
+                searchTerm: searchTerm,
+                category: category,
+            },
+        });
         const dataPromise = promise.then((response) => response);
         return dataPromise;
     }

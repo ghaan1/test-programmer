@@ -10,7 +10,7 @@
 
 <body class="font-sans antialiased">
     <div class="min-h-screen flex">
-        <div class="w-full md:w-1/2 bg-white flex flex-col justify-center items-center p-8">
+        <div class="w-full md:w-1/2 bg-white flex flex-col justify-center items-center p-8" x-data="setupLogin">
             <div class="max-w-sm w-full">
                 <div class="flex items-center justify-center space-x-2 mb-5">
                     <img src="{{ asset('assets/image/Handbag.png') }}" alt="SIMS Logo" class="h-6"
@@ -18,18 +18,19 @@
                     <h2 class="text-2xl font-bold text-black">SIMS Web App</h2>
                 </div>
                 <p class="text-black font-bold text-3xl text-center mb-12">Masuk atau buat akun untuk memulai</p>
-                <form action="#" method="POST">
+                <form @submit.prevent="submitLogin">
                     @csrf
                     <div class="mb-8 relative">
-                        <input type="email" id="email" name="email" required
+                        <input type="email" id="email" name="email" x-model="email" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-red-button focus:border-custom-red-button pl-10"
                             placeholder="masukan email anda">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
                             @
                         </div>
                     </div>
-                    <div class="mb-8 relative" x-data="passwordToggle">
-                        <input :type="showPassword ? 'text' : 'password'" id="password" name="password" required
+                    <div class="mb-8 relative">
+                        <input :type="showPassword ? 'text' : 'password'" id="password" name="password"
+                            x-model="password" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-custom-red-button focus:border-custom-red-button pl-10"
                             placeholder="masukan password anda">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
@@ -47,8 +48,10 @@
                                 </g>
                             </svg>
                         </div>
+
                         <button type="button" @click="togglePasswordVisibility"
                             class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <!-- Icon for password visibility toggle -->
                             <svg x-show="!showPassword" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-500"
                                 version="1.1" id="fi_709612" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                                 viewBox="0 0 511.999 511.999" style="enable-background:new 0 0 511.999 511.999;"
@@ -114,7 +117,6 @@
                                     d="m503.29 227.6c-28.75-42.57-66.82-77.8-110.08-101.89-42.6-23.72-89.43-36.23-135.56-36.23-.55 0-1.09 0-1.64 0s-1.09 0-1.64 0c-31.39 0-63.11 5.8-93.6 16.98l30.11 30.11c20.95-6 42.33-9.09 63.49-9.09h1.51.26c40.14-.3 81.15 10.59 118.58 31.42 38.08 21.2 71.65 52.31 97.07 89.95 2.93 4.34 2.93 9.94 0 14.27-20.83 30.84-47.12 57.28-76.87 77.49l27.29 27.29c31.29-22.34 58.94-50.75 81.07-83.52 11.64-17.25 11.64-39.54 0-56.79z">
                                 </path>
                             </svg>
-
                         </button>
                     </div>
                     <button type="submit"

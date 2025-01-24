@@ -3,53 +3,76 @@ import { globalScript } from "./globalScript";
 export default function product() {
     return {
         products: [],
-        filteredProducts: [],
         searchTerm: "",
         selectedCategory: "",
         categories: [],
         loading: true,
+        noData: false,
+        pagination: {
+            current_page: 1,
+            per_page: 0,
+            total: 0,
+            last_page: 1,
+            total_data_page: 0,
+        },
 
-        async getProducts() {
-            this.loading = true;
+        async getCategories() {
             const global = new globalScript();
             try {
-                const response = await global.getDataProduct();
-                this.products = response.data.data.product;
-                this.filteredProducts = this.products; // Default display all products
-                console.log("Products loaded:", this.products);
-
-                // Get categories (assuming it's an API endpoint or static data)
-                const categoryResponse = await global.getDataCategory();
-                this.categories = categoryResponse.data.data.categories;
+                const response = await global.getDataCategory();
+                if (response.data.status === "success") {
+                    this.categories = response.data.data.category;
+                }
             } catch (error) {
-                console.error("Error loading products:", error);
+                global.SwalErrorProses(error.message, "kategori produk");
+            }
+        },
+
+        async getProducts(page = 1) {
+            this.loading = true;
+            this.noData = false;
+            const global = new globalScript();
+            try {
+                const response = await global.getDataProduct(
+                    page,
+                    this.searchTerm,
+                    this.selectedCategory
+                );
+
+                if (response.data.status === "success") {
+                    this.products = response.data.data.product;
+                    this.pagination = response.data.data.pagination;
+                }
+            } catch (error) {
+                this.noData = true;
                 this.products = [];
-                this.filteredProducts = [];
+                this.pagination = {
+                    current_page: 1,
+                    per_page: 0,
+                    total: 0,
+                    last_page: 1,
+                    total_data_page: 0,
+                };
             } finally {
                 this.loading = false;
             }
         },
 
         filterProducts() {
-            this.filteredProducts = this.products.filter((product) => {
-                const matchesSearch = product.name
-                    .toLowerCase()
-                    .includes(this.searchTerm.toLowerCase());
-                const matchesCategory = this.selectedCategory
-                    ? product.category_id === this.selectedCategory
-                    : true;
-                return matchesSearch && matchesCategory;
-            });
+            this.getProducts(1);
         },
 
-        deleteProduct(id) {
-            // Logic for deleting a product
-            console.log(`Delete product with ID: ${id}`);
+        goToPage(pageNumber) {
+            if (pageNumber >= 1 && pageNumber <= this.pagination.last_page) {
+                this.pagination.current_page = pageNumber;
+                this.getProducts(pageNumber);
+            }
         },
 
-        updateProduct(id) {
-            // Logic for updating a product
-            console.log(`Update product with ID: ${id}`);
+        resetFilters() {
+            this.searchTerm = "";
+            this.selectedCategory = "";
+            this.getProducts(1);
         },
     };
 }

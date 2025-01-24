@@ -1,4 +1,4 @@
-<div x-data="sidebar" :class="{ 'w-20': isCollapsed, 'w-64': !isCollapsed }" id="sidebar"
+<div x-data="sidebar" :class="{ 'min-w-20': isCollapsed, 'min-w-64': !isCollapsed }" id="sidebar"
     class="bg-custom-red-bg text-white flex flex-col p-6 sidebar-transition relative">
     <a href="#" class="flex items-center mb-6">
         <img src="{{ asset('assets/image/Handbag.png') }}" alt="SIMS Logo" class="h-6">
@@ -33,6 +33,21 @@
                     </div>
                 </li>
             @endforeach
+
+            <li class="sidebar-item group relative"
+                :class="{
+                    'bg-custom-red-active-sidebar rounded-xl': isActive === 'Logout',
+                    'hover:bg-custom-red-active-sidebar rounded-xl': !isCollapsed
+                }">
+                <a href="#" @click="logout"
+                    class="flex items-center w-full text-lg font-medium text-white hover:text-gray-200 transition duration-200"
+                    :class="{ 'p-3': !isCollapsed, 'py-3': isCollapsed, 'mx-1': isCollapsed }">
+                    <div class="flex items-center gap-2 w-full">
+                        <img src="{{ asset('assets/image/SignOut.png') }}" alt="SignOut Icon" class="h-6 icon">
+                        <span class="text" :class="{ 'hidden': isCollapsed }">Logout</span>
+                    </div>
+                </a>
+            </li>
         </ul>
     </div>
 
