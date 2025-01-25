@@ -119,7 +119,7 @@ class ProductController extends Controller
                 'fk_product_category' => $request->category,
                 'name' => $request->name,
                 'price' => $request->buy_price,
-                'selling_price' => $request->sell_price,
+                'selling_price' => $request->buy_price * 1.30,
                 'stock'  => $request->stock,
                 'image' => $imagePath,
                 'created_at' => now(),
@@ -157,16 +157,16 @@ class ProductController extends Controller
                 $fileName = $id . "-" . General::microseconds() . '.' . $file->getClientOriginalExtension();
                 $imagePath = $file->storeAs('images', $fileName, 'public');
             }
-
             DB::table('product')->where('id', $id)->update([
                 'fk_product_category' => $request->category,
                 'name' => $request->name,
                 'price' => $request->buy_price,
-                'selling_price' => $request->sell_price,
+                'selling_price' => $request->buy_price * 1.30,
                 'stock'  => $request->stock,
                 'image' => $imagePath,
                 'updated_at' => now(),
             ]);
+
 
             DB::commit();
             return ApiResponse::success([]);
@@ -200,7 +200,7 @@ class ProductController extends Controller
                 )
                 ->first();
 
-            // product image convert to Storage URL
+
             $product->image = Storage::url($product->image);
 
 
