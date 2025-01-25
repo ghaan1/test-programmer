@@ -21,9 +21,10 @@ Route::group(
         });
 
         Route::prefix('product')->group(function () {
+            Route::get('{id}', [ProductController::class, 'show']);
             Route::post('store', [ProductController::class, 'store']);
-            // Route::post('update', [ProductController::class, 'update']);
-            // Route::post('delete', [ProductController::class, 'delete']);
+            Route::post('update/{id}', [ProductController::class, 'update']);
+            Route::delete('destroy/{id}', [ProductController::class, 'destroy']);
         });
     }
 );

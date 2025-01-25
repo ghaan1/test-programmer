@@ -97,7 +97,7 @@ export class globalScript {
             );
             return;
         }
-        const promise = axios.get(`api/get/data-product-category`, {
+        const promise = axios.get(`/api/get/data-product-category`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
@@ -132,10 +132,72 @@ export class globalScript {
         return dataPromise;
     }
 
-    saveProduct(data) {
+    createProduct(data) {
         const token = localStorage.getItem("token");
-        // Tergantung endpoint
         const promise = axios.post("/api/product/store", data, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const dataPromise = promise.then((response) => response);
+        return dataPromise;
+    }
+
+    updateProduct(id, data) {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            this.SwalError(
+                "Token tidak ditemukan. Anda harus login terlebih dahulu.",
+                "Update",
+                "melakukan"
+            );
+            return;
+        }
+
+        const promise = axios.post(`/api/product/update/${id}`, data, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const dataPromise = promise.then((response) => response);
+        return dataPromise;
+    }
+
+    getDataProductDetail(id) {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            this.SwalError(
+                "Token tidak ditemukan. Anda harus login terlebih dahulu.",
+                "Logout",
+                "melakukan"
+            );
+            return;
+        }
+        const promise = axios.get(`/api/product/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+        });
+        const dataPromise = promise.then((response) => response);
+        return dataPromise;
+    }
+
+    deleteProduct(id) {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            this.SwalError(
+                "Token tidak ditemukan. Anda harus login terlebih dahulu.",
+                "Delete",
+                "melakukan"
+            );
+            return;
+        }
+
+        const promise = axios.delete(`/api/product/destroy/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

@@ -25,4 +25,9 @@ class Product extends Model
     ];
 
     protected $keyType = 'string';
+
+    public function category()
+    {
+        return $this->belongsTo(ProductCategory::class, 'fk_product_category');
+    }
 }

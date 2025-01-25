@@ -3,7 +3,6 @@ import Swal from "sweetalert2";
 
 export default function product() {
     return {
-        // Daftar produk & pagination
         products: [],
         searchTerm: "",
         selectedCategory: "",
@@ -18,35 +17,29 @@ export default function product() {
             total_data_page: 0,
         },
 
-        // Contoh state form untuk create
-        form: {
-            fk_product_category: "",
-            name: "",
-            price: "",
-            selling_price: "",
-            stock: "",
+        global: new globalScript(),
+
+        async init() {
+            await this.getCategories();
+            await this.getProducts();
         },
 
-        // Ambil list kategori
         async getCategories() {
-            const global = new globalScript();
             try {
-                const response = await global.getDataCategory();
+                const response = await this.global.getDataCategory();
                 if (response.data.status === "success") {
                     this.categories = response.data.data.category;
                 }
             } catch (error) {
-                global.SwalErrorProses(error.message, "kategori produk");
+                this.global.SwalErrorProses(error.message, "kategori produk");
             }
         },
 
-        // Ambil list produk
         async getProducts(page = 1) {
             this.loading = true;
             this.noData = false;
-            const global = new globalScript();
             try {
-                const response = await global.getDataProduct(
+                const response = await this.global.getDataProduct(
                     page,
                     this.searchTerm,
                     this.selectedCategory
@@ -55,6 +48,7 @@ export default function product() {
                 if (response.data.status === "success") {
                     this.products = response.data.data.product;
                     this.pagination = response.data.data.pagination;
+                    this.noData = this.products.length === 0;
                 }
             } catch (error) {
                 this.noData = true;
@@ -71,61 +65,6 @@ export default function product() {
             }
         },
 
-        // Buat fungsi create product
-        async createProduct() {
-            // Contoh confirm pakai Swal
-            const confirm = await Swal.fire({
-                title: "Konfirmasi",
-                text: "Yakin menyimpan data produk ini?",
-                icon: "question",
-                showCancelButton: true,
-                confirmButtonText: "Ya, Simpan",
-                cancelButtonText: "Batal",
-            });
-
-            if (!confirm.isConfirmed) {
-                return; // Batal
-            }
-
-            // Panggil globalScript
-            const global = new globalScript();
-            try {
-                // Contoh panggil method saveProduct (Anda buat sendiri di globalScript)
-                const response = await global.saveProduct(this.form);
-
-                if (response.data.status === "success") {
-                    Swal.fire(
-                        "Berhasil",
-                        "Produk berhasil disimpan",
-                        "success"
-                    );
-                    // Reset form
-                    this.form = {
-                        fk_product_category: "",
-                        name: "",
-                        price: "",
-                        selling_price: "",
-                        stock: "",
-                    };
-                    // Refresh data
-                    this.getProducts();
-                } else {
-                    Swal.fire(
-                        "Gagal",
-                        response.data.message || "Terjadi kesalahan",
-                        "error"
-                    );
-                }
-            } catch (error) {
-                Swal.fire(
-                    "Error",
-                    error.response?.data?.message || error.message,
-                    "error"
-                );
-            }
-        },
-
-        // Fungsi filtering & pagination
         filterProducts() {
             this.getProducts(1);
         },
@@ -141,6 +80,65 @@ export default function product() {
             this.searchTerm = "";
             this.selectedCategory = "";
             this.getProducts(1);
+        },
+
+        async deleteProduct(id) {
+            Swal.fire({
+                title: "Konfirmasi",
+                text: "Yakin ingin menghapus produk ini?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Ya, Hapus!",
+                cancelButtonText: "Batal",
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await this.global.deleteProduct(id);
+                        if (response.data.status === "success") {
+                            this.global.SwalSuccess(
+                                "Produk berhasil dihapus",
+                                "Produk",
+                                "dihapus"
+                            );
+                            this.getProducts(this.pagination.current_page);
+                        } else {
+                            this.global.SwalError(
+                                response.data.message || "Terjadi kesalahan",
+                                "Delete",
+                                "menghapus"
+                            );
+                        }
+                    } catch (error) {
+                        this.global.SwalError(
+                            "Terjadi kesalahan saat menghapus produk.",
+                            "Delete",
+                            "menghapus"
+                        );
+                    }
+                }
+            });
+        },
+
+        async exportExcel() {
+            try {
+                const params = new URLSearchParams();
+                if (this.searchTerm) {
+                    params.append("searchTerm", this.searchTerm);
+                }
+                if (this.selectedCategory) {
+                    params.append("category", this.selectedCategory);
+                }
+
+                const url = `/product/export?${params.toString()}`;
+
+                window.open(url, "_blank");
+            } catch (error) {
+                this.global.SwalError(
+                    "Terjadi kesalahan saat mengekspor data.",
+                    "Export",
+                    "mengekspor"
+                );
+            }
         },
     };
 }

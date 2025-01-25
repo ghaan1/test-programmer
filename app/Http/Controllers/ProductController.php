@@ -10,22 +10,27 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Resources\ProductResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Http\Requests\ProductRequest;
+use App\Http\Requests\UpdateProductRequest;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ProductsExport;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        // check session
-        $user = Auth::user();
-        // dd($user);
         return view('product.index');
     }
 
     public function create()
     {
         return view('product.create');
+    }
+
+    public function edit()
+    {
+        return view('product.edit');
     }
 
     public function getData(Request $request)
@@ -47,7 +52,8 @@ class ProductController extends Controller
                     'product.stock',
                     'product.image',
                 )
-                ->leftJoin('product_category', 'product.fk_product_category', '=', 'product_category.id');
+                ->leftJoin('product_category', 'product.fk_product_category', '=', 'product_category.id')
+                ->orderBy('product.created_at', 'desc');
 
             if ($request->has('searchTerm') && $request->searchTerm != '') {
                 $searchTerm = '%' . $request->searchTerm . '%';
@@ -65,14 +71,16 @@ class ProductController extends Controller
                 $query->where('product.fk_product_category', $request->category);
             }
 
-            $product = $query->paginate($request->get('per_page', 10));
+            $perPage = $request->get('per_page', 10);
+            $page = $request->get('page', 1);
+            $product = $query->paginate($perPage, ['*'], 'page', $page);
 
             if ($product->isEmpty()) {
                 return ApiResponse::error('Produk tidak ditemukan', 404);
             }
 
             return ApiResponse::success([
-                'product' => ProductResource::collection($product->items()),
+                'product' => ProductResource::collection($product),
                 'pagination' => [
                     'current_page' => $product->currentPage(),
                     'per_page' => $product->perPage(),
@@ -87,21 +95,13 @@ class ProductController extends Controller
         }
     }
 
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
         $response = General::checkJWT();
         if ($response === false) {
             return ApiResponse::error("Token invalid", 401);
         }
 
-        $request->validate([
-            'category' => 'required|exists:product_category,id',
-            'name' => 'required|string|unique:product,name',
-            'buy_price' => 'required|numeric',
-            'sell_price' => 'required|numeric',
-            'stock' => 'required|numeric',
-            'image' => 'required|image|mimes:jpg,jpeg,png|max:100',
-        ]);
         DB::beginTransaction();
 
         try {
@@ -115,12 +115,15 @@ class ProductController extends Controller
             }
 
             DB::table('product')->insert([
+                'id' => $idProduct,
                 'fk_product_category' => $request->category,
                 'name' => $request->name,
                 'price' => $request->buy_price,
                 'selling_price' => $request->sell_price,
                 'stock'  => $request->stock,
                 'image' => $imagePath,
+                'created_at' => now(),
+                'updated_at' => now(),
             ]);
 
             return ApiResponse::success([]);
@@ -131,5 +134,120 @@ class ProductController extends Controller
         } finally {
             DB::commit();
         }
+    }
+
+    public function update(UpdateProductRequest $request, $id)
+    {
+        $response = General::checkJWT();
+        if ($response === false) {
+            return ApiResponse::error("Token invalid", 401);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $product = DB::table('product')->where('id', $id)->first();
+            if (!$product) {
+                return ApiResponse::error("Produk tidak ditemukan", 404);
+            }
+
+            $imagePath = $product->image;
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $fileName = $id . "-" . General::microseconds() . '.' . $file->getClientOriginalExtension();
+                $imagePath = $file->storeAs('images', $fileName, 'public');
+            }
+
+            DB::table('product')->where('id', $id)->update([
+                'fk_product_category' => $request->category,
+                'name' => $request->name,
+                'price' => $request->buy_price,
+                'selling_price' => $request->sell_price,
+                'stock'  => $request->stock,
+                'image' => $imagePath,
+                'updated_at' => now(),
+            ]);
+
+            DB::commit();
+            return ApiResponse::success([]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return ApiResponse::error($e->getMessage());
+        }
+    }
+
+    public function show($id)
+    {
+        $response = General::checkJWT();
+        if ($response === false) {
+            return ApiResponse::error("Token invalid", 401);
+        }
+
+        try {
+            $product = DB::table('product')
+                ->join('product_category', 'product.fk_product_category', '=', 'product_category.id')
+                ->where('product.id', $id)
+                ->select(
+                    'product.id',
+                    'product.name',
+                    'product.fk_product_category',
+                    'product_category.name as category_name',
+                    'product.price',
+                    'product.selling_price',
+                    'product.stock',
+                    'product.image',
+                )
+                ->first();
+
+            // product image convert to Storage URL
+            $product->image = Storage::url($product->image);
+
+
+            if (!$product) {
+                return ApiResponse::error("Produk tidak ditemukan", 404);
+            }
+
+            return ApiResponse::success(['product' => $product]);
+        } catch (Exception $e) {
+            Log::error($e->getMessage());
+            return ApiResponse::error($e->getMessage());
+        }
+    }
+
+
+    public function destroy($id)
+    {
+        $response = General::checkJWT();
+        if ($response === false) {
+            return ApiResponse::error("Token invalid", 401);
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $product = DB::table('product')->where('id', $id)->first();
+            if (!$product) {
+                return ApiResponse::error("Produk tidak ditemukan", 404);
+            }
+
+            DB::table('product')->where('id', $id)->delete();
+
+            DB::commit();
+            return ApiResponse::success([]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return ApiResponse::error($e->getMessage());
+        }
+    }
+
+    public function export(Request $request)
+    {
+        $searchTerm = $request->input('searchTerm');
+        $category = $request->input('category');
+
+        return Excel::download(new ProductsExport($searchTerm, $category), 'products.xlsx');
     }
 }

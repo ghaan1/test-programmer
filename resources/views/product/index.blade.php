@@ -1,13 +1,12 @@
 <x-master>
-    <div x-data="product()" x-init="getCategories();
-    getProducts()">
+    <div x-data="product()" x-init="init()">
         <h1 class="text-2xl font-bold text-gray-800 mb-8">Daftar Produk</h1>
 
         <div class="mb-4 flex items-center justify-between">
             <div class="w-1/2 flex items-center space-x-4">
                 <div class="w-1/2 relative">
-                    <input type="text" x-model="searchTerm" @input="filterProducts()" placeholder="Cari barang..."
-                        class="w-full px-4 py-2 border rounded-md pl-10" />
+                    <input type="text" x-model="searchTerm" @input.debounce.500ms="filterProducts()"
+                        placeholder="Cari barang..." class="w-full px-4 py-2 border rounded-md pl-10" />
                     <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                         <i class="fas fa-search"></i>
                     </span>
@@ -26,7 +25,8 @@
                 </div>
             </div>
             <div class="w-1/2 flex justify-end space-x-4">
-                <button class="bg-custom-greed-excel-button text-white px-4 py-2 rounded-md flex items-center">
+                <button class="bg-custom-greed-excel-button text-white px-4 py-2 rounded-md flex items-center"
+                    @click="exportExcel()">
                     <span class="mr-2">
                         <img src="{{ asset('assets/image/MicrosoftExcelLogo.png') }}" alt="Excel Icon" class="w-4 h-4">
                     </span>
@@ -79,11 +79,13 @@
                             <td class="border px-4 py-2" x-text="product.price"></td>
                             <td class="border px-4 py-2" x-text="product.selling_price"></td>
                             <td class="border px-4 py-2" x-text="product.stock"></td>
-                            <td class="border px-4 py-2">
-                                <button @click="updateProduct(product.id)" class="text-white px-2 py-2 rounded">
+                            <td class="border px-4 py-2 flex justify-center">
+                                <button @click="window.location.href = `/product/edit/${product.id}`"
+                                    class="text-white px-2 py-2 rounded  hover:bg-yellow-700">
                                     <img src="{{ asset('assets/image/edit.png') }}" alt="Edit Icon" class="w-5 h-5">
                                 </button>
-                                <button @click="deleteProduct(product.id)" class="text-white px-2 py-2 rounded ml-2">
+                                <button @click="deleteProduct(product.id)"
+                                    class="text-white px-2 py-2 rounded  hover:bg-red-700 ml-2">
                                     <img src="{{ asset('assets/image/delete.png') }}" alt="Delete Icon" class="w-5 h-5">
                                 </button>
                             </td>
