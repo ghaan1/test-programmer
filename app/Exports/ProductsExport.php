@@ -48,8 +48,8 @@ class ProductsExport implements FromCollection, WithMapping, WithHeadings, WithE
             $product->id,
             $product->name,
             $product->category ? $product->category->name : 'N/A',
-            number_format($product->price, 0, ',', '.'),
-            number_format($product->selling_price, 0, ',', '.'),
+            $product->price,
+            $product->selling_price,
             $product->stock,
             env('APP_URL') . Storage::url($product->image),
         ];
