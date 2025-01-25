@@ -125,14 +125,13 @@ class ProductController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+            DB::commit();
 
             return ApiResponse::success([]);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e->getMessage());
             return ApiResponse::error($e->getMessage());
-        } finally {
-            DB::commit();
         }
     }
 
