@@ -35,6 +35,8 @@ class AuthController extends Controller
                 $request->session()->regenerate();
                 $token = JWTAuth::fromUser($user);
                 return ApiResponse::success(['token' => $token]);
+            } else {
+                return response()->json(['error' => 'Email atau password salah'], 401);
             }
         } catch (\Exception $e) {
             Log::error($e->getMessage());

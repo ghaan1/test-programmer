@@ -45,6 +45,7 @@ export default function setupLogin() {
                         }, 500);
                     }
                 } catch (error) {
+                    Swal.close();
                     global.SwalError(
                         "Gagal login, silakan coba lagi.",
                         "Login",
