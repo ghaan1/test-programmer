@@ -44,15 +44,22 @@ export default function createProduct() {
                     "Drop file gambar di sini atau klik untuk memilih",
                 init: function () {
                     let dz = this;
+
                     dz.on("addedfile", function (file) {
+
+                        if (dz.files.length > 1) {
+                            dz.removeFile(dz.files[0]);
+                        }
                         vm.form.image = file;
                     });
-                    dz.on("removedfile", function (file) {
+
+                    dz.on("removedfile", function () {
                         vm.form.image = null;
                     });
                 },
             });
         },
+
 
         confirmCreateProduct() {
             Swal.fire({
@@ -77,7 +84,7 @@ export default function createProduct() {
             formData.append("category", this.form.category);
             formData.append("name", this.form.name);
             formData.append("buy_price", this.form.buy_price);
-            formData.append("sell_price", this.form.sell_price); // Pastikan sell_price terisi
+            formData.append("sell_price", this.form.sell_price);
             formData.append("stock", this.form.stock);
 
             if (this.form.image) {

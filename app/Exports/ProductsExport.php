@@ -55,7 +55,7 @@ class ProductsExport implements FromCollection, WithMapping, WithHeadings, WithE
         ];
     }
 
-    
+
     public function headings(): array
     {
         return [
@@ -74,14 +74,26 @@ class ProductsExport implements FromCollection, WithMapping, WithHeadings, WithE
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-                $event->sheet->getDelegate()->getStyle('A1:G1')->getFont()->setBold(true);
-                $event->sheet->getDelegate()->getColumnDimension('A')->setWidth(10);
-                $event->sheet->getDelegate()->getColumnDimension('B')->setWidth(30);
-                $event->sheet->getDelegate()->getColumnDimension('C')->setWidth(25);
-                $event->sheet->getDelegate()->getColumnDimension('D')->setWidth(20);
-                $event->sheet->getDelegate()->getColumnDimension('E')->setWidth(20);
-                $event->sheet->getDelegate()->getColumnDimension('F')->setWidth(15);
-                $event->sheet->getDelegate()->getColumnDimension('G')->setWidth(40);
+                $sheet = $event->sheet->getDelegate();
+
+                $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+
+                $sheet->getColumnDimension('A')->setWidth(10);
+                $sheet->getColumnDimension('B')->setWidth(30);
+                $sheet->getColumnDimension('C')->setWidth(25);
+                $sheet->getColumnDimension('D')->setWidth(20);
+                $sheet->getColumnDimension('E')->setWidth(20);
+                $sheet->getColumnDimension('F')->setWidth(15);
+                $sheet->getColumnDimension('G')->setWidth(40);
+
+                $highestRow = $sheet->getHighestRow();
+                for ($row = 2; $row <= $highestRow; $row++) {
+                    for ($col = 'A'; $col <= 'G'; $col++) {
+                        $cellCoordinate = $col . $row;
+                        $cellValue = $sheet->getCell($cellCoordinate)->getValue();
+                        $sheet->setCellValueExplicit($cellCoordinate, $cellValue, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+                    }
+                }
             },
         ];
     }
