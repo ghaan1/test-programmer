@@ -24,10 +24,11 @@ export default function profilePage() {
                     position: user.position,
                     image: null,
                 };
-
+                window.defaultAvatarUrl = "assets/image/avatar.png";
                 this.existingImageUrl = user.image
-                    ? `/storage/${user.image}`
-                    : "{{ asset('assets/image/avatar.png') }}";
+                ? `/storage/${user.image}`
+                : "assets/image/avatar.png";
+
             } catch (error) {
                 this.global.SwalErrorProses("Gagal memuat profil.");
             }
