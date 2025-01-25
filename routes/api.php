@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DataController;
+use App\Http\Controllers\ProfileController;
 
 Route::group(['middleware' => ['web']], function () {
     Route::post('login', [AuthController::class, 'login']);
@@ -26,5 +27,9 @@ Route::group(
             Route::post('update/{id}', [ProductController::class, 'update']);
             Route::delete('destroy/{id}', [ProductController::class, 'destroy']);
         });
+
+
+        Route::get('/profile', [ProfileController::class, 'getData']);
+        Route::post('/profile/update', [ProfileController::class, 'updateProfile']);
     }
 );

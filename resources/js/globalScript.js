@@ -206,4 +206,46 @@ export class globalScript {
         const dataPromise = promise.then((response) => response);
         return dataPromise;
     }
+
+    async getProfile() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            this.SwalError(
+                "Token tidak ditemukan. Anda harus login terlebih dahulu.",
+                "Delete",
+                "melakukan"
+            );
+            return;
+        }
+
+        const promise = axios.get("/api/profile", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const dataPromise = promise.then((response) => response);
+        return dataPromise;
+    }
+
+    async updateProfile(data) {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            this.SwalError(
+                "Token tidak ditemukan. Anda harus login terlebih dahulu.",
+                "Update",
+                "melakukan"
+            );
+            return;
+        }
+
+        const promise = axios.post("/api/profile/update", data, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const dataPromise = promise.then((response) => response);
+        return dataPromise;
+    }
 }

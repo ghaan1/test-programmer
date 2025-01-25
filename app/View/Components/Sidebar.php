@@ -25,10 +25,12 @@ class Sidebar extends Component
             [
                 "title" => "Produk",
                 "assets" => "Package.png",
+                "route" => "product.index",
             ],
             [
                 "title" => "Profile",
                 "assets" => "User.png",
+                "route" => "profile.index",
             ],
         ];
 

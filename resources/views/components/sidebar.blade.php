@@ -13,7 +13,7 @@
                         'bg-custom-red-active-sidebar rounded-xl': isActive === '{{ $item['title'] }}',
                         'hover:bg-custom-red-active-sidebar rounded-xl': !isCollapsed
                     }">
-                    <a href="#" @click="isActive = '{{ $item['title'] }}'"
+                    <a href="{{ route($item['route']) }}" @click="isActive = '{{ $item['title'] }}'"
                         class="flex items-center w-full text-lg font-medium text-white hover:text-gray-200 transition duration-200"
                         :class="{ 'p-3': !isCollapsed, 'py-3': isCollapsed, 'mx-1': isCollapsed }"
                         @mouseover="setHovered('{{ $item['title'] }}')" @mouseleave="resetHovered()">
